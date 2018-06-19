@@ -2,9 +2,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Uploader.Database where
 
-import Uploader.Types (CreateUploadFile(..), UploadFile)
+import Uploader.Types
+import Uploader.Util
+
 import Platform.SQLite
 import Data.Maybe
+import Data.Int
+import Data.List.Split
 import qualified Data.Text as T
 import Database.SQLite.Simple
 
@@ -14,28 +18,57 @@ insertFile form = withConn $ \conn ->
     ( createUploadFileName form
     , createUploadFileType form
     , createUploadFileSize form
-    , createUploadFileURI form)
+    , createUploadFileURI form
+    , createUploadFileIsLink form )
 
     where
-      qry = "INSERT INTO files (name, type, size, uri, created_at) \
-            \ VALUES (?, ?, ?, ?, datetime('now'))"
+      qry = "INSERT INTO files (name, type, size, uri, is_link, created_at) \
+            \ VALUES (?, ?, ?, ?, ?, datetime('now'))"
 
-deleteFile :: DB r m => T.Text -> m ()
+deleteFile :: DB r m => String -> m ()
 deleteFile fileId = withConn $ \conn ->
   execute conn qry (Only fileId)
     where
       qry = "DELETE FROM files WHERE name = ?"
 
-isFileExist :: DB r m => T.Text -> m Int
+isFileExist :: DB r m => String -> m Bool
 isFileExist name =  withConn $ \conn -> do
   results <- query conn qry (Only name) :: IO [Only Int]
-  return $ length results
+  return $ not (null results)
   where
     qry = "SELECT 1 FROM files WHERE name = ?"
 
-findFile :: DB r m => T.Text -> m (Maybe UploadFile)
+findFile :: DB r m => String -> m (Maybe UploadFile)
 findFile name = do
   results <- withConn $ \conn -> query conn qry (Only name)
   return $ listToMaybe results
   where
-    qry = "SELECT name, type, size, uri, strftime('%Y-%m-%dT%H:%M:%fZ', created_at) as created FROM files WHERE name = ?"
+    qry = "SELECT name, type, size, uri, is_link, strftime('%Y-%m-%dT%H:%M:%fZ', created_at) as created FROM files WHERE name = ?"
+
+findRealFiles :: DB r m => String -> Int64 -> m [UploadFile]
+findRealFiles contentType size =
+  withConn $ \conn -> query conn qry (contentType, size)
+  where
+    qry = "SELECT name, type, size, uri, is_link, strftime('%Y-%m-%dT%H:%M:%fZ', created_at) as created FROM files WHERE type = ? AND size = ? AND is_link = 0"
+
+findDuplicatedFileNames :: DB r m => String -> m [String]
+findDuplicatedFileNames fileName =
+  withConn $ \conn -> do
+    results <- query conn qry (Only nameValue) :: IO [Only String]
+    return $ map (\(Only x) -> x) results
+    where
+      qry = "SELECT name FROM files WHERE name LIKE ?"
+      (name, ext) = splitFileExtension fileName
+      nameValue = name ++ "%." ++ ext
+
+findLinkFiles :: DB r m => String -> Int -> m [UploadFile]
+findLinkFiles uri limit =
+  withConn $ \conn -> query conn qry (uri, limit)
+    where
+      qry = "SELECT name, type, size, uri, is_link, strftime('%Y-%m-%dT%H:%M:%fZ', created_at) as created FROM files WHERE uri = ? LIMIT ?"
+
+changeLinkFileToReal :: DB r m => String -> m ()
+changeLinkFileToReal name =
+  withConn $ \conn -> execute conn qry (Only name)
+    where
+      qry = "UPDATE files SET is_link = 0 WHERE name = ?"

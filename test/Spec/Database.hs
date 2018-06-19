@@ -16,7 +16,8 @@ createFileInput =  CreateUploadFile
             { createUploadFileName = "test.png"
             , createUploadFileType = "png"
             , createUploadFileSize = 2000
-            , createUploadFileURI = "uploads/test.png" }
+            , createUploadFileURI = "uploads/test.png"
+            , createUploadFileIsLink = 0 }
 
 
 fileDbSpec :: Spec

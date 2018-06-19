@@ -1,23 +1,17 @@
 module Uploader.File where
 
 import Network.Wai.Parse
+import Control.Monad
 import Control.Monad.IO.Class
-import Data.List.Split
-import Data.List
 
-import qualified Data.Text as T
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Char8 as BS
 
-import System.FilePath
-import System.Directory (doesFileExist)
+import System.FilePath ((</>))
+import System.Directory (doesFileExist, removeFile)
 
-appendFileNameSurfix :: String -> String -> String
-appendFileNameSurfix name surfix
-  | length parts <= 1 = name ++ "_" ++ surfix
-  | otherwise = intercalate "_" (init parts ++ [surfix]) ++ "." ++ last parts
-    where
-      parts = splitOn "." name
+import Uploader.Types
+import Uploader.Util
 
 -- Change file name surfix to avoid override duplicated file name
 correctFileName :: FilePath -> FilePath -> IO FilePath
@@ -36,10 +30,26 @@ correctFileName filePath name =
 
 
 -- Save file into hard disk
-saveFile :: MonadIO m => FilePath -> FileInfo B.ByteString -> m FilePath
+saveFile :: MonadIO m => FilePath -> FileInfo B.ByteString -> m CreateUploadFile
 saveFile uploadPath file = do
   fName <- liftIO $ correctFileName uploadPath $ BS.unpack (fileName file)
   liftIO $ B.writeFile (uploadPath </> fName) fc
-  return fName
+  return $ CreateUploadFile
+    fName
+    (BS.unpack $ fileContentType file)
+    (B.length fc)
+    (uploadPath </> fName)
+    0
   where
     fc = fileContent file
+
+-- Delete file from path
+deleteFile :: MonadIO m => FilePath -> m ()
+deleteFile filePath = liftIO $ doesFileExist filePath
+  >>= \doesExist -> when doesExist $ removeFile filePath
+
+-- check whether file content between 2 files are same
+isSameFile :: MonadIO m => FilePath -> B.ByteString -> m Bool
+isSameFile filePath bs = do
+  fileContent <- liftIO $ B.readFile filePath
+  return $ fileContent == bs

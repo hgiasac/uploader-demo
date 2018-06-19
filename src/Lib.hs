@@ -21,6 +21,11 @@ import System.FilePath ((</>))
 import qualified Platform.SQLite as DB
 import qualified Platform.HTTP as HTTP
 
+import qualified Uploader.HTTP as UploaderHTTP
+import qualified Uploader.Service as UploaderService
+import qualified Uploader.File as UploaderFile
+import qualified Uploader.Database as UploaderDB
+
 type Env = DB.Env
 
 newtype AppT a = AppT
@@ -35,3 +40,25 @@ server = do
   -- start the app
   let runner app = flip runReaderT dbEnv $ unAppT app
   HTTP.main runner
+
+
+instance UploaderHTTP.Service AppT where
+  createFile = UploaderService.createFile
+  getFile = UploaderService.getFile
+  deleteFile = UploaderService.deleteFile
+
+
+-- File Handler class
+instance UploaderService.UploadFileHandler AppT where
+  saveFileToDisk = UploaderFile.saveFile
+  deleteFileFromDisk = UploaderFile.deleteFile
+  isSameFile = UploaderFile.isSameFile
+
+instance UploaderService.UploadFileRepo AppT where
+  insertFile = UploaderDB.insertFile
+  findFileByName = UploaderDB.findFile
+  deleteFileByName = UploaderDB.deleteFile
+  findRealFiles = UploaderDB.findRealFiles
+  findDuplicatedFileNames = UploaderDB.findDuplicatedFileNames
+  findLinkFiles = UploaderDB.findLinkFiles
+  changeLinkFileToReal = UploaderDB.changeLinkFileToReal

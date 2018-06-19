@@ -23,7 +23,7 @@ import System.Environment
 
 import qualified Uploader.HTTP as UploaderHTTP
 
-type App r m = (MonadIO m)
+type App r m = (MonadIO m, UploaderHTTP.Service m)
 
 main :: (App r m) => (m Response -> IO Response) -> IO ()
 main runner = do

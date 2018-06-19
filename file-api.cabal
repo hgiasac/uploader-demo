@@ -25,6 +25,9 @@ library
     , Uploader.Types
     , Uploader.HTTP
     , Uploader.File
+    , Uploader.Service
+    , Uploader.Util
+
 
   -- other-modules:
   hs-source-dirs:

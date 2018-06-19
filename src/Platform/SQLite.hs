@@ -25,7 +25,8 @@ init = do
 
 acquirePool :: IO Env
 acquirePool = do
-  uri <- fromMaybe "file.db" <$> lookupEnv "DATABASE_URL"
+  uri <- (\x -> if x == "" then "file.db"
+                else x) . fromMaybe "" <$> lookupEnv "DATABASE_URL"
   createPool (open uri) close 1 10 10
 
 

@@ -25,3 +25,130 @@ nix-buid ./release.nix
 ```
 
 Server will run at `http://localhost:3000`. If you want to use another port, set `PORT` environment
+
+## Reuse similar content
+
+Store file metadata in Database and content in hard disk. If file content is same, just insert a record with path uri point to absolute path in hard disk without writing file. It is same as a shortcut/link file
+
+# API Documentation
+
+## Upload File (can upload many files)
+
+**URL** : `/uploads/`
+
+**Method** : `POST`
+
+**Content-Type**: `application/x-www-form-urlencoded`
+
+**Auth required** : NO
+
+### Success Response
+
+**Code** : `200 OK`
+
+**Content example**
+
+```json
+[{
+    "name": "file.jpg",
+    "type": "image/jpeg",
+    "size": 300000,
+    "uri": "uploads/file.jpg",
+    "isLink": 0 // 0: Physic file, 1: Shortcut file
+}]
+```
+
+## Direct Upload
+
+**URL** : `/upload-direct`
+
+**Method** : `POST`
+
+**Content-Type**: `image/jpeg` (Depend on file's MIME type)
+
+**Auth required** : NO
+
+### Success Response
+
+**Code** : `200 OK`
+
+**Content example**
+
+```json
+[{
+    "name": "file.jpg",
+    "type": "image/jpeg",
+    "size": 300000,
+    "uri": "uploads/file.jpg",
+    "isLink": 0 // 0: Physic file, 1: Shortcut file
+}]
+```
+
+### Error Response
+
+**Condition** : X-File-Name or Content-Type header is empty
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+    "message": "X-File-Name is required"
+}
+```
+
+
+## GET file by name
+
+**URL** : `/uploads/:name`
+
+**Method** : `GET`
+
+**Auth required** : NO
+
+### Success Response
+
+**Code** : `200 OK`
+
+**Content** : File content
+
+### Error Response
+
+**Condition** : File not found
+
+**Code** : `404 NOT FOUND`
+
+**Content** :
+
+```json
+{
+    "message": "File not found"
+}
+```
+
+## DELETE file by name
+
+**URL** : `/uploads/:name`
+
+**Method** : `DELETE`
+
+**Auth required** : NO
+
+### Success Response
+
+**Code** : `204 NO CONTENT`
+
+### Error Response
+
+**Condition** : File not found
+
+**Code** : `404 NOT FOUND`
+
+**Content** :
+
+```json
+{
+    "message": "File not found"
+}
+```
