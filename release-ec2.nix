@@ -1,6 +1,6 @@
 let
   region = "ap-northeast-1";
-  accessKeyId = "xxx";
+  accessKeyId = "AKIAJXKLVZ2FJ2NJMEUA";
 
 in
 { fileapi =

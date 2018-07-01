@@ -35,6 +35,11 @@ Support targets:
 - Virtualbox: `release-vbox.nix`
 - AWS EC2: `release-ec2.nix`
 
+```
+nixops create ./release-configuration.nix ./release-vbox.nix -d fileapi
+nixops deploy -d fileapi --option system "x86_64-linux"
+```
+
 Default directory for database and file storage is `/tmp`. Default port is `3000`. You can change the config in `release-configuration.nix` file
 
 
