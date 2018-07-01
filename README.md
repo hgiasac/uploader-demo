@@ -14,8 +14,9 @@ Write a program that provides an HTTP API to store and retrieve files. It should
 - GHC 8.2.2
 - Nix
 - SQLite (for store file metadata)
+- NixOps (for deployment)
 
-## How to use
+## Local Development
 
 Run nix-build then run execute file
 
@@ -26,9 +27,22 @@ nix-buid ./release.nix
 
 Server will run at `http://localhost:3000`. If you want to use another port, set `PORT` environment
 
+## Deployment
+
+Use NixOps to deploy
+Support targets:
+- NixOS machines: `release-nixos.nix`
+- Virtualbox: `release-vbox.nix`
+- AWS EC2: `release-ec2.nix`
+
+Default directory for database and file storage is `/tmp`. Default port is `3000`. You can change the config in `release-configuration.nix` file
+
+
 ## Reuse similar content
 
 Store file metadata in Database and content in hard disk. If file content is same, just insert a record with path uri point to absolute path in hard disk without writing file. It is same as a shortcut/link file
+
+
 
 # API Documentation
 

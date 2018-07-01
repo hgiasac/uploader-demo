@@ -3,6 +3,8 @@ module Uploader.File where
 import Network.Wai.Parse
 import Control.Monad
 import Control.Monad.IO.Class
+import Data.Maybe
+import System.Environment
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Char8 as BS
@@ -12,6 +14,11 @@ import System.Directory (doesFileExist, removeFile)
 
 import Uploader.Types
 import Uploader.Util
+
+-- Get base upload directory from environment
+uploadBasePath :: IO String
+uploadBasePath = (\x -> if x == "" then "uploads"
+              else x) . fromMaybe "" <$> lookupEnv "UPLOAD_DIR"
 
 -- Change file name surfix to avoid override duplicated file name
 correctFileName :: FilePath -> FilePath -> IO FilePath

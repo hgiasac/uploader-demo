@@ -15,6 +15,7 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
+data-files: migration/*.sql
 
 library
   exposed-modules:
@@ -38,15 +39,11 @@ library
     , base
     , bytestring
     , call-stack
-    , classy-prelude
     , containers
     , data-has
-    , digestive-functors
-    , digestive-functors-aeson
     , distributive
     , http-types
     , kan-extensions
-    , lens
     , mtl
     , resource-pool
     , scientific

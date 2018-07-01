@@ -13,6 +13,7 @@ import qualified Data.Text.Lazy as LT
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Char8 as BS
 import Uploader.Types
+import qualified Uploader.File as UF
 
 headerFileName :: LT.Text
 headerFileName = "X-File-Name"
@@ -31,15 +32,17 @@ routes = do
 
   post "/uploads" $ do
     fs <- files
+    uploadDir <- liftIO $ UF.uploadBasePath
     results <- mapM
-      (stopIfError uploadFileErrorHandler . createFile "uploads" . snd) fs
+      (stopIfError uploadFileErrorHandler . createFile uploadDir . snd) fs
     json results
 
   post "/upload-direct" $ do
+    uploadDir <- liftIO $ UF.uploadBasePath
     fName <- LT.unpack <$> validateHeader headerFileName
     contentType <- LT.unpack <$> validateHeader headerContentType
     fc <- body
-    result <- lift $ createFile "uploads" $ FileInfo (BS.pack fName)
+    result <- lift $ createFile uploadDir $ FileInfo (BS.pack fName)
       (BS.pack contentType) fc
     case result of
       Right model -> json [model]

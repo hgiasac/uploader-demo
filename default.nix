@@ -1,8 +1,7 @@
 { mkDerivation, aeson, array, base, bytestring, call-stack
-, classy-prelude, containers, data-has, digestive-functors
-, digestive-functors-aeson, directory, distributive, filepath
-, hspec, http-types, kan-extensions, lens, mtl, resource-pool
-, scientific, scotty, semigroups, split, sqlite-simple, stdenv
+, containers, data-has, directory, distributive, filepath, hspec
+, http-types, kan-extensions, mtl, resource-pool, scientific
+, scotty, semigroups, split, sqlite-simple, stdenv
 , template-haskell, text, time, transformers, utf8-string, vector
 , wai, wai-cors, wai-extra, wai-middleware-static, warp
 }:
@@ -12,10 +11,10 @@ mkDerivation {
   src = ./.;
   isLibrary = true;
   isExecutable = true;
+  enableSeparateDataOutput = true;
   libraryHaskellDepends = [
-    aeson array base bytestring call-stack classy-prelude containers
-    data-has digestive-functors digestive-functors-aeson directory
-    distributive filepath hspec http-types kan-extensions lens mtl
+    aeson array base bytestring call-stack containers data-has
+    directory distributive filepath hspec http-types kan-extensions mtl
     resource-pool scientific scotty semigroups split sqlite-simple
     template-haskell text time transformers utf8-string vector wai
     wai-cors wai-extra wai-middleware-static warp
@@ -23,4 +22,10 @@ mkDerivation {
   executableHaskellDepends = [ base ];
   testHaskellDepends = [ base hspec mtl sqlite-simple ];
   license = stdenv.lib.licenses.bsd3;
+
+
+  postInstall = ''
+    echo "Copy Backup SQL file"
+    cp -r migration $out
+  '';
 }

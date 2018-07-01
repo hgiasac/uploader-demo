@@ -22,24 +22,26 @@ import Network.Wai.Parse
 import System.Environment
 
 import qualified Uploader.HTTP as UploaderHTTP
+import Uploader.File
 
 type App r m = (MonadIO m, UploaderHTTP.Service m)
 
 main :: (App r m) => (m Response -> IO Response) -> IO ()
 main runner = do
   port <- acquirePort
-  scottyT (read port :: Int) runner routes
+  uploadDir <- uploadBasePath
+  scottyT (read port :: Int) runner $ routes uploadDir
   where
     acquirePort = fromMaybe "3000" <$> lookupEnv "PORT"
 
 -- * Routing
 
-routes :: (App r m) => ScottyT LT.Text m ()
-routes = do
+routes :: (App r m) => String -> ScottyT LT.Text m ()
+routes uploadDir = do
   -- middlewares
 
   middleware logStdoutDev
-  middleware $ staticPolicy (noDots <> addBase "uploads")
+  middleware $ staticPolicy (noDots <> addBase uploadDir)
 
   middleware $ cors $ const $ Just simpleCorsResourcePolicy
     { corsRequestHeaders = "Authorization":simpleHeaders
