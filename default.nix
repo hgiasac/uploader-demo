@@ -27,5 +27,9 @@ mkDerivation {
   postInstall = ''
     echo "Copy Backup SQL file"
     cp -r migration $out
+
+    mkdir -p $out/share/nix/fileapi
+    cp release-configuration.nix $out/share/nix/fileapi/
+
   '';
 }

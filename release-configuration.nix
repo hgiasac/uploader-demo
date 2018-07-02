@@ -3,14 +3,14 @@
 
   fileapi =
     { config, pkgs, ... }: let
-    fileapi = import ./release.nix { inherit pkgs; };
+    fileapi = import ./release.nix { };
   in
   {
 
     networking.hostName = "filepi";
 
     networking.firewall.allowedTCPPorts = [ 22 80 3000 ];
-    environment.systemPackages = [ fileapi ];
+    # environment.systemPackages = [ fileapi ];
 
     systemd.services.fileapi =
     { description = "File API Webserver";
@@ -31,8 +31,8 @@
 
       serviceConfig =
       { # User = "root";
-        ExecStart = "${fileapi}/bin/file-api";
-        WorkingDirectory = "${fileapi}";
+        ExecStart = "${fileapi.fileapi}/bin/file-api";
+        WorkingDirectory = "${fileapi.fileapi}";
 
       };
     };

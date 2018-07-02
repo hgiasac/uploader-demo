@@ -1,11 +1,12 @@
 let
   region = "ap-northeast-1";
   accessKeyId = "AKIAJXKLVZ2FJ2NJMEUA";
-
 in
 { fileapi =
   { resources, ... }:
-  { deployment.targetEnv = "ec2";
+  {
+
+    deployment.targetEnv = "ec2";
     deployment.ec2.accessKeyId = accessKeyId;
     deployment.ec2.region = region;
     deployment.ec2.ebsInitialRootDiskSize = 20;
@@ -13,6 +14,7 @@ in
     deployment.ec2.keyPair = resources.ec2KeyPairs.fileapi-keys;
 
     nixpkgs.system = "x86_64-linux";
+
   };
 
   resources.ec2KeyPairs.fileapi-keys =
