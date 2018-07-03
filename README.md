@@ -27,6 +27,29 @@ nix-buid ./release.nix
 
 Server will run at `http://localhost:3000`. If you want to use another port, set `PORT` environment
 
+## Use as module
+
+Import `/path/to/uploader-demo/fileapi.nix` to `configuration.nix` file and enable service with options
+
+```
+
+  imports = [
+    ...
+    /path/to/uploader-demo/fileapi.nix
+  ];
+
+
+  services = {
+    fileAPI = {
+      enable = true;
+      dbPath = "/tmp/fileapi/db";
+      dbName = "file.db";
+      uploadDirectory = "/tmp/fileapi/uploads";
+      port = 3000;
+    };
+  };
+```
+
 ## Deployment
 
 Use NixOps to deploy
