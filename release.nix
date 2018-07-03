@@ -6,12 +6,14 @@ let
   packageOverrides = pkgs: rec {
     haskell = pkgs.haskell // {
       packages = pkgs.haskell.packages // {
+
         "${compiler}" = pkgs.haskell.packages."${compiler}".override {
-          overrides = haskellPackagesNew: haskellPackagesOld: rec {
+            overrides = haskellPackagesNew: haskellPackagesOld: rec {
 
-            fileapi =
-              haskellPackagesNew.callPackage ./default.nix { };
+              fileapiOld =
+                haskellPackagesNew.callPackage ./default.nix { };
 
+              fileapi = pkgs.haskell.lib.dontHaddock fileapiOld;
 
             };
           };
