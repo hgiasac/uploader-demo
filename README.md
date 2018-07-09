@@ -21,7 +21,7 @@ Write a program that provides an HTTP API to store and retrieve files. It should
 Run nix-build then run execute file
 
 ```
-nix-buid ./release.nix
+nix-build ./release.nix
 ./result/bin/file-api
 ```
 
@@ -80,7 +80,7 @@ Store file metadata in Database and content in hard disk. If file content is sam
 
 **Method** : `POST`
 
-**Content-Type**: `application/x-www-form-urlencoded`
+**Content-Type**: `multipart/form-data`
 
 **Auth required** : NO
 

@@ -9,14 +9,6 @@ import qualified Data.ByteString.Char8 as BS
 import System.FilePath ((</>))
 import Uploader.Types
 
--- split file name and extension
-splitFileExtension :: String -> (String, String)
-splitFileExtension name
-  | length parts <= 1 = (name, "")
-  | otherwise = (intercalate "." $ init parts, last parts)
-  where
-    parts = splitOn "." name
-
 -- append file name with surfix
 appendFileNameSurfix :: String -> String -> String
 appendFileNameSurfix name surfix

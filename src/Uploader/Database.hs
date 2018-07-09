@@ -9,7 +9,9 @@ import Platform.SQLite
 import Data.Maybe
 import Data.Int
 import Data.List.Split
+import System.FilePath.Posix (splitExtension)
 import qualified Data.Text as T
+
 import Database.SQLite.Simple
 
 insertFile :: DB r m => CreateUploadFile -> m ()
@@ -58,8 +60,8 @@ findDuplicatedFileNames fileName =
     return $ map (\(Only x) -> x) results
     where
       qry = "SELECT name FROM files WHERE name LIKE ?"
-      (name, ext) = splitFileExtension fileName
-      nameValue = name ++ "%." ++ ext
+      (name, ext) = splitExtension fileName
+      nameValue = name ++ "%" ++ ext
 
 findLinkFiles :: DB r m => String -> Int -> m [UploadFile]
 findLinkFiles uri limit =
