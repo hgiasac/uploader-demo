@@ -61,4 +61,4 @@ instance UploaderService.UploadFileRepo AppT where
   findRealFiles = UploaderDB.findRealFiles
   findDuplicatedFileNames = UploaderDB.findDuplicatedFileNames
   findLinkFiles = UploaderDB.findLinkFiles
-  changeLinkFileToReal = UploaderDB.changeLinkFileToReal
+  lockFile = UploaderDB.lockFile

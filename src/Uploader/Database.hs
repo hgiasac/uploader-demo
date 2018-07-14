@@ -14,14 +14,14 @@ import qualified Data.Text as T
 
 import Database.SQLite.Simple
 
-insertFile :: DB r m => CreateUploadFile -> m ()
+insertFile :: DB r m => UploadFile -> m ()
 insertFile form = withConn $ \conn ->
   execute conn qry
-    ( createUploadFileName form
-    , createUploadFileType form
-    , createUploadFileSize form
-    , createUploadFileURI form
-    , createUploadFileIsLink form )
+    ( uploadFileName form
+    , uploadFileType form
+    , uploadFileSize form
+    , uploadFileURI form
+    , uploadFileIsLink form )
 
     where
       qry = "INSERT INTO files (name, type, size, uri, is_link, created_at) \
@@ -45,13 +45,13 @@ findFile name = do
   results <- withConn $ \conn -> query conn qry (Only name)
   return $ listToMaybe results
   where
-    qry = "SELECT name, type, size, uri, is_link, strftime('%Y-%m-%dT%H:%M:%fZ', created_at) as created FROM files WHERE name = ?"
+    qry = "SELECT name, type, size, uri, is_link as created FROM files WHERE name = ?"
 
 findRealFiles :: DB r m => String -> Int64 -> m [UploadFile]
 findRealFiles contentType size =
   withConn $ \conn -> query conn qry (contentType, size)
   where
-    qry = "SELECT name, type, size, uri, is_link, strftime('%Y-%m-%dT%H:%M:%fZ', created_at) as created FROM files WHERE type = ? AND size = ? AND is_link = 0"
+    qry = "SELECT name, type, size, uri, is_link as created FROM files WHERE type = ? AND size = ?"
 
 findDuplicatedFileNames :: DB r m => String -> m [String]
 findDuplicatedFileNames fileName =
@@ -67,10 +67,10 @@ findLinkFiles :: DB r m => String -> Int -> m [UploadFile]
 findLinkFiles uri limit =
   withConn $ \conn -> query conn qry (uri, limit)
     where
-      qry = "SELECT name, type, size, uri, is_link, strftime('%Y-%m-%dT%H:%M:%fZ', created_at) as created FROM files WHERE uri = ? LIMIT ?"
+      qry = "SELECT name, type, size, uri, is_link as created FROM files WHERE uri = ? LIMIT ?"
 
-changeLinkFileToReal :: DB r m => String -> m ()
-changeLinkFileToReal name =
+lockFile :: DB r m => String -> m ()
+lockFile name =
   withConn $ \conn -> execute conn qry (Only name)
     where
-      qry = "UPDATE files SET is_link = 0 WHERE name = ?"
+      qry = "UPDATE files SET is_link = 1 WHERE name = ?"

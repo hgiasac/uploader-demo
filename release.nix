@@ -13,7 +13,16 @@ let
               fileapiOld =
                 haskellPackagesNew.callPackage ./default.nix { };
 
-              fileapi = pkgs.haskell.lib.dontHaddock fileapiOld;
+              fileapiNoDoc = pkgs.haskell.lib.dontCheck (
+                pkgs.haskell.lib.dontHaddock fileapiOld
+              );
+              fileapi1 = fileapiNoDoc.overrideDerivation (oldAttrs: {
+
+                  postInstall = ''
+                    echo "Copy Backup SQL file"
+                    cp -r migration $out
+                  '';
+                });
 
             };
           };
@@ -26,5 +35,5 @@ let
 
 in
 {
-  fileapi = pkgs.haskell.packages.${compiler}.fileapi;
+  fileapi = pkgs.haskell.packages.${compiler}.fileapi1;
 }

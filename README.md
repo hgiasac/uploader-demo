@@ -171,9 +171,14 @@ Store file metadata in Database and content in hard disk. If file content is sam
 
 ## DELETE file by name
 
-**URL** : `/uploads/:name`
+**URL** : `/uploads/:name{?force=1}`
 
 **Method** : `DELETE`
+
+**Query Parameter**:
+
++ name (string): File name
++ force (string): Forced delete
 
 **Auth required** : NO
 

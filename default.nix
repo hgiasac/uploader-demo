@@ -11,7 +11,6 @@ mkDerivation {
   src = ./.;
   isLibrary = true;
   isExecutable = true;
-  enableSeparateDataOutput = true;
   libraryHaskellDepends = [
     aeson array base bytestring call-stack containers data-has
     directory distributive filepath hspec http-types kan-extensions mtl
@@ -22,14 +21,4 @@ mkDerivation {
   executableHaskellDepends = [ base ];
   testHaskellDepends = [ base hspec mtl sqlite-simple ];
   license = stdenv.lib.licenses.bsd3;
-
-
-  postInstall = ''
-    echo "Copy Backup SQL file"
-    cp -r migration $out
-
-    mkdir -p $out/share/nix/fileapi
-    cp release-configuration.nix $out/share/nix/fileapi/
-
-  '';
 }

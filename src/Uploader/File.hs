@@ -37,18 +37,19 @@ correctFileName filePath name =
 
 
 -- Save file into hard disk
-saveFile :: MonadIO m => FilePath -> FileInfo B.ByteString -> m CreateUploadFile
+saveFile :: MonadIO m => FilePath -> FileInfo B.ByteString -> m UploadFile
 saveFile uploadPath file = do
-  fName <- liftIO $ correctFileName uploadPath $ BS.unpack (fileName file)
-  liftIO $ B.writeFile (uploadPath </> fName) fc
-  return $ CreateUploadFile
+  newName <- liftIO $ randomFileName fName
+  liftIO $ B.writeFile (uploadPath </> newName) fc
+  return $ UploadFile
     fName
     (BS.unpack $ fileContentType file)
     (B.length fc)
-    (uploadPath </> fName)
+    (uploadPath </> newName)
     0
   where
     fc = fileContent file
+    fName =  BS.unpack (fileName file)
 
 -- Delete file from path
 deleteFile :: MonadIO m => FilePath -> m ()

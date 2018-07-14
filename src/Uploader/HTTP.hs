@@ -22,9 +22,9 @@ headerContentType :: LT.Text
 headerContentType = "Content-Type"
 
 class (Monad m) => Service m where
-  createFile :: String -> FileInfo B.ByteString -> m (Either UploadFileError CreateUploadFile)
+  createFile :: String -> FileInfo B.ByteString -> m (Either UploadFileError UploadFile)
   getFile :: String -> m (Either UploadFileError UploadFile)
-  deleteFile :: String -> m (Either UploadFileError ())
+  deleteFile :: String -> Maybe LT.Text -> m (Either UploadFileError ())
 
 
 routes :: (MonadIO m, Service m) => ScottyT LT.Text m ()
@@ -51,6 +51,7 @@ routes = do
 
   get "/uploads/:name" $ do
     name <- param "name"
+
     result <- lift $ getFile name
     case result of
       Right model -> do
@@ -59,11 +60,17 @@ routes = do
       Left err -> uploadFileErrorHandler err
 
   delete "/uploads/:name" $ do
+
     name <- param "name"
-    result <- lift $ deleteFile name
+    force <- mayParam "force"
+    result <- lift $ deleteFile name force
     case result of
       Right _ -> status status204
       Left err -> uploadFileErrorHandler err
+
+-- get query string param
+mayParam :: (ScottyError e, Monad m) => LT.Text -> ActionT e m (Maybe LT.Text)
+mayParam name = (Just <$> param name) `rescue` const (return Nothing)
 
 -- Error Handler
 uploadFileErrorHandler ::  (ScottyError e, Monad m)

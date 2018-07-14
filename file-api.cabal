@@ -13,9 +13,8 @@ maintainer:          toannp90@gmail.com
 category:            Web
 build-type:          Simple
 extra-source-files:  ChangeLog.md
-cabal-version:       >=1.10
+cabal-version:       >=2.0.0.0
 
-data-files: migration/*.sql
 
 library
   exposed-modules:
@@ -62,7 +61,6 @@ library
     , wai-middleware-static
     , warp
     , sqlite-simple
-    , hspec
     , directory
     , split
 

@@ -3,7 +3,11 @@
 
   fileapi =
     { config, pkgs, ... }: let
-    fileapi = import ./release.nix { };
+      fileapi = import ./release.nix { };
+      uploadDirectory = "/tmp/fileapi/uploads";
+      dbPath = "/tmp/fileapi/db";
+      dbName = "files.db";
+      port = "3000";
   in
   {
 
@@ -17,16 +21,16 @@
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
       environment = {
-        UPLOAD_DIR = "/tmp/fileapi/uploads";
-        DATABASE_URL = "/tmp/fileapi/db/file.db";
-        PORT = "3000";
+        UPLOAD_DIR = uploadDirectory;
+        DATABASE_URL = "${dbPath}/${dbName}";
+        PORT = port;
       };
 
       preStart = ''
-        mkdir -p /tmp/fileapi/db
-        mkdir -p /tmp/fileapi/uploads
-        chmod -R 1777 /tmp/fileapi/db
-        chmod -R 1777 /tmp/fileapi/uploads
+        mkdir -p ${dbPath}
+        mkdir -p ${uploadDirectory}
+        chmod -R 1777 ${dbPath}
+        chmod -R 1777 ${uploadDirectory}
       '';
 
       serviceConfig =

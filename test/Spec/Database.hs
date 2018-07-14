@@ -11,13 +11,13 @@ import qualified Platform.SQLite as DB
 spec :: Spec
 spec = fileDbSpec
 
-createFileInput :: CreateUploadFile
-createFileInput =  CreateUploadFile
-            { createUploadFileName = "test.png"
-            , createUploadFileType = "png"
-            , createUploadFileSize = 2000
-            , createUploadFileURI = "uploads/test.png"
-            , createUploadFileIsLink = 0 }
+createFileInput :: UploadFile
+createFileInput =  UploadFile
+            { uploadFileName = "test.png"
+            , uploadFileType = "png"
+            , uploadFileSize = 2000
+            , uploadFileURI = "uploads/test.png"
+            , uploadFileIsLink = 0 }
 
 
 fileDbSpec :: Spec
